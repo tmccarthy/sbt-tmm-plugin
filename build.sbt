@@ -2,6 +2,14 @@ val settingsHelper = ProjectSettingsHelper("au.id.tmm", "sbt")(
   githubProjectName = "sbt-tmm-plugin",
 )
 
+addCommandAlias("ci-release", ";releaseEarly")
+
+ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowPublishTargetBranches :=
+  Seq(RefPredicate.StartsWith(Ref.Tag("v")))
+
+ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+
 settingsHelper.settingsForBuild
 
 lazy val root = project
