@@ -1,4 +1,4 @@
-val settingsHelper = ProjectSettingsHelper("au.id.tmm", "sbt-tmm")(
+val settingsHelper = ProjectSettingsHelper("au.id.tmm", "sbt")(
   githubProjectName = "sbt-tmm",
 )
 
@@ -16,7 +16,7 @@ lazy val plugin = project
   .in(file("plugin"))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "tmm-sbt-plugin",
+    name := "sbt-tmm-plugin",
     ScalacSettings.scalacSetting,
     publishConfiguration := publishConfiguration.value.withOverwrite(true),
     publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),

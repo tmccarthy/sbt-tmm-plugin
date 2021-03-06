@@ -5,7 +5,7 @@ import sbt._
 
 object DependencySettings {
 
-  val silencerVersion = "1.7.0"
+  val silencerVersion = "1.7.1"
   val mUnitVersion    = "0.7.22"
 
   val commonDependencies: Seq[Def.Setting[Seq[ModuleID]]] = Seq(

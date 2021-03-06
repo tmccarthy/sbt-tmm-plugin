@@ -17,7 +17,7 @@ final case class ProjectSettingsHelper private (
   githubUserWebsite: String = "http://tmm.id.au",
 ) {
 
-  def settingsForBuild = {
+  def settingsForBuild =
     List(
       releaseEarly / Keys.aggregate := false, // Workaround for https://github.com/scalacenter/sbt-release-early/issues/30
       Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile,
@@ -26,7 +26,9 @@ final case class ProjectSettingsHelper private (
         addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full), // TODO upgrade this
         organization := sonatypeProfile + "." + baseProjectName,
         publishMavenStyle := true,
-        sonatypeProjectHosting := Some(GitHubHosting(githubUser, githubProjectName, githubUserFullName, githubUserEmail)),
+        sonatypeProjectHosting := Some(
+          GitHubHosting(githubUser, githubProjectName, githubUserFullName, githubUserEmail),
+        ),
         homepage := Some(url(s"https://github.com/$githubUser/$githubProjectName")),
         startYear := Some(2019),
         licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
@@ -36,16 +38,20 @@ final case class ProjectSettingsHelper private (
             githubUserFullName,
             githubUserEmail,
             url(githubUserWebsite),
-          )
+          ),
         ),
-        scmInfo := Some(ScmInfo(url(s"https://github.com/$githubUser/$githubProjectName"), s"scm:git:https://github.com/$githubUser/$githubProjectName.git")),
+        scmInfo := Some(
+          ScmInfo(
+            url(s"https://github.com/$githubUser/$githubProjectName"),
+            s"scm:git:https://github.com/$githubUser/$githubProjectName.git",
+          ),
+        ),
         pgpPublicRing := file("/tmp/secrets/pubring.kbx"),
         pgpSecretRing := file("/tmp/secrets/secring.gpg"),
         releaseEarlyWith := SonatypePublisher,
         releaseEarlyEnableInstantReleases := false,
-      )
+      ),
     )
-  }
 
   def settingsForRootProject = Seq(
     publish / skip := true,
