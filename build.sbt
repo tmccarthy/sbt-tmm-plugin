@@ -1,5 +1,5 @@
 val settingsHelper = ProjectSettingsHelper("au.id.tmm", "sbt")(
-  githubProjectName = "sbt-tmm",
+  githubProjectName = "sbt-tmm-plugin",
 )
 
 settingsHelper.settingsForBuild
