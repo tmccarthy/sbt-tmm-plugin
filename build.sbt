@@ -9,7 +9,7 @@ ThisBuild / githubWorkflowPublishTargetBranches :=
   Seq(RefPredicate.StartsWith(Ref.Tag("v")))
 
 ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll")))
+ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtCheckSbt")))
 ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 
 ThisBuild / githubWorkflowPublishPreamble := List(
@@ -17,8 +17,8 @@ ThisBuild / githubWorkflowPublishPreamble := List(
     commands = List("""./.secrets/decrypt.sh"""),
     name = Some("Decrypt secrets"),
     env = Map(
-      "AES_KEY" -> "${{ secrets.AES_KEY }}"
-    )
+      "AES_KEY" -> "${{ secrets.AES_KEY }}",
+    ),
   ),
 )
 
