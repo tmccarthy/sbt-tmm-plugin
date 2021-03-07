@@ -12,6 +12,13 @@ ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll")))
 ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 
+ThisBuild / githubWorkflowPublishPreamble := List(
+  WorkflowStep.Run(
+    commands = List("""./.secrets/decrypt.sh "${AES_KEY}""""),
+    name = Some("Decrypt secrets"),
+  ),
+)
+
 settingsHelper.settingsForBuild
 
 lazy val root = project
