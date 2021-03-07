@@ -109,9 +109,10 @@ jobs:
       - name: Decrypt secrets
         env:
           AES_KEY: ${{ secrets.AES_KEY }}
+        run: ./.secrets/decrypt.sh
+
+      - env:
           PGP_PASSWORD: ${{ secrets.PGP_PASSWORD }}
           SONA_PASS: ${{ secrets.SONATYPE_PASSWORD }}
           SONA_USER: ${{ secrets.SONATYPE_USER }}
-        run: ./.secrets/decrypt.sh
-
-      - run: sbt ++${{ matrix.scala }} ci-release
+        run: sbt ++${{ matrix.scala }} ci-release

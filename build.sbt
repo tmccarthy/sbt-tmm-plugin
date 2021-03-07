@@ -10,17 +10,23 @@ ThisBuild / githubWorkflowPublishTargetBranches :=
 
 ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck")))
-ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
+ThisBuild / githubWorkflowPublish := List(
+  WorkflowStep.Sbt(
+    List("ci-release"),
+    env = Map(
+      "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
+      "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
+    ),
+  ),
+)
 
 ThisBuild / githubWorkflowPublishPreamble := List(
   WorkflowStep.Run(
     commands = List("""./.secrets/decrypt.sh"""),
     name = Some("Decrypt secrets"),
     env = Map(
-      "AES_KEY"      -> "${{ secrets.AES_KEY }}",
-      "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
-      "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
-      "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
+      "AES_KEY" -> "${{ secrets.AES_KEY }}",
     ),
   ),
 )
