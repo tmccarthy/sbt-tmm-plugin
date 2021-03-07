@@ -9,7 +9,7 @@ ThisBuild / githubWorkflowPublishTargetBranches :=
   Seq(RefPredicate.StartsWith(Ref.Tag("v")))
 
 ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtCheckSbt")))
+ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck")))
 ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 
 ThisBuild / githubWorkflowPublishPreamble := List(
