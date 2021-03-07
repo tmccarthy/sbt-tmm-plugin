@@ -17,7 +17,10 @@ ThisBuild / githubWorkflowPublishPreamble := List(
     commands = List("""./.secrets/decrypt.sh"""),
     name = Some("Decrypt secrets"),
     env = Map(
-      "AES_KEY" -> "${{ secrets.AES_KEY }}",
+      "AES_KEY"           -> "${{ secrets.AES_KEY }}",
+      "PGP_PASSWORD"      -> "${{ secrets.PGP_PASSWORD }}",
+      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONATYPE_USER"     -> "${{ secrets.SONATYPE_USER }}",
     ),
   ),
 )
@@ -51,4 +54,4 @@ lazy val plugin = project
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0-M4" % "test",
   )
 
-addCommandAlias("check", ";+test;scalafmtCheckAll")
+addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")

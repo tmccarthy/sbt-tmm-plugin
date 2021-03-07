@@ -97,4 +97,7 @@ object TmmSbtPlugin extends AutoPlugin {
       ),
     )
 
+  // TODO check alias
+  // TODO github workflow plugin
+
 }
