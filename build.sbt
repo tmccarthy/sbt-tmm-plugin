@@ -8,7 +8,7 @@ ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches :=
   Seq(RefPredicate.StartsWith(Ref.Tag("v")))
 
-ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@11")
+ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
 ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll")))
 ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 
