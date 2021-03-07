@@ -110,8 +110,8 @@ jobs:
         env:
           AES_KEY: ${{ secrets.AES_KEY }}
           PGP_PASSWORD: ${{ secrets.PGP_PASSWORD }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
+          SONA_PASS: ${{ secrets.SONATYPE_PASSWORD }}
+          SONA_USER: ${{ secrets.SONATYPE_USER }}
         run: ./.secrets/decrypt.sh
 
       - run: sbt ++${{ matrix.scala }} ci-release

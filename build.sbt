@@ -17,10 +17,10 @@ ThisBuild / githubWorkflowPublishPreamble := List(
     commands = List("""./.secrets/decrypt.sh"""),
     name = Some("Decrypt secrets"),
     env = Map(
-      "AES_KEY"           -> "${{ secrets.AES_KEY }}",
-      "PGP_PASSWORD"      -> "${{ secrets.PGP_PASSWORD }}",
-      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
-      "SONATYPE_USER"     -> "${{ secrets.SONATYPE_USER }}",
+      "AES_KEY"      -> "${{ secrets.AES_KEY }}",
+      "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
+      "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
     ),
   ),
 )
