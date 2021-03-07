@@ -14,8 +14,11 @@ ThisBuild / githubWorkflowPublish := Seq(WorkflowStep.Sbt(List("ci-release")))
 
 ThisBuild / githubWorkflowPublishPreamble := List(
   WorkflowStep.Run(
-    commands = List("""./.secrets/decrypt.sh "${AES_KEY}""""),
+    commands = List("""./.secrets/decrypt.sh"""),
     name = Some("Decrypt secrets"),
+    env = Map(
+      "AES_KEY" -> "${{ secrets.AES_KEY }}"
+    )
   ),
 )
 
