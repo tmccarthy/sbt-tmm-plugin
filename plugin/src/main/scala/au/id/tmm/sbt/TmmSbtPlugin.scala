@@ -4,7 +4,8 @@ import ch.epfl.scala.sbt.release.AutoImported.{releaseEarly, releaseEarlyEnableI
 import ch.epfl.scala.sbt.release.ReleaseEarlyPlugin
 import com.typesafe.sbt.SbtPgp.autoImportImpl.{pgpPublicRing, pgpSecretRing}
 import sbt.Keys._
-import sbt.{Def, _}
+import sbt.{Def, addCommandAlias, _}
+import sbtghactions.GenerativePlugin.autoImport._
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.GitHubHosting
 import xerial.sbt.Sonatype.autoImport.sonatypeProjectHosting
@@ -42,7 +43,8 @@ object TmmSbtPlugin extends AutoPlugin {
   override def requires: Plugins =
     xerial.sbt.Sonatype &&
       ch.epfl.scala.sbt.release.ReleaseEarlyPlugin &&
-      org.scalafmt.sbt.ScalafmtPlugin
+      org.scalafmt.sbt.ScalafmtPlugin &&
+      sbtghactions.GitHubActionsPlugin
 
   override def globalSettings: Seq[Def.Setting[_]] = List(
     (ThisBuild / githubUser) := "tmccarthy",
@@ -95,9 +97,31 @@ object TmmSbtPlugin extends AutoPlugin {
         scalaVersion := primaryScalaVersion.value,
         crossScalaVersions := Seq(primaryScalaVersion.value) ++ otherScalaVersions.value,
       ),
-    )
-
-  // TODO check alias
-  // TODO github workflow plugin
+    ) ++ addCommandAlias("ci-release", ";releaseEarly") ++ List(
+      ThisBuild / githubWorkflowTargetTags ++= Seq("v*"),
+      ThisBuild / githubWorkflowPublishTargetBranches :=
+        Seq(RefPredicate.StartsWith(Ref.Tag("v"))),
+      ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11"),
+      ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck"))),
+      ThisBuild / githubWorkflowPublish := List(
+        WorkflowStep.Sbt(
+          List("ci-release"),
+          env = Map(
+            "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
+            "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
+            "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
+          ),
+        ),
+      ),
+      ThisBuild / githubWorkflowPublishPreamble := List(
+        WorkflowStep.Run(
+          commands = List("""./.secrets/decrypt.sh"""), // TODO don't do this with an external script
+          name = Some("Decrypt secrets"),
+          env = Map(
+            "AES_KEY" -> "${{ secrets.AES_KEY }}",
+          ),
+        ),
+      ),
+    ) ++ addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
 
 }
