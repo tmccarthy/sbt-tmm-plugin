@@ -40,6 +40,8 @@ object TmmSbtPlugin extends AutoPlugin {
 
   import autoImport._
 
+  override def trigger = PluginTrigger.AllRequirements
+
   override def requires: Plugins =
     xerial.sbt.Sonatype &&
       ch.epfl.scala.sbt.release.ReleaseEarlyPlugin &&
@@ -47,13 +49,13 @@ object TmmSbtPlugin extends AutoPlugin {
       sbtghactions.GitHubActionsPlugin
 
   private def defaultsForSettings = List(
-    (ThisBuild / githubUser) := "tmccarthy",
-    (ThisBuild / githubProjectName) := baseProjectName.value,
-    (ThisBuild / githubUserFullName) := "Timothy McCarthy",
-    (ThisBuild / githubUserEmail) := "ebh042@gmail.com",
-    (ThisBuild / githubUserWebsite) := "http://tmm.id.au",
-    (ThisBuild / primaryScalaVersion) := "2.13.5",
-    (ThisBuild / otherScalaVersions) := List(),
+    githubUser := "tmccarthy",
+    githubProjectName := (ThisBuild / baseProjectName).value,
+    githubUserFullName := "Timothy McCarthy",
+    githubUserEmail := "ebh042@gmail.com",
+    githubUserWebsite := "http://tmm.id.au",
+    primaryScalaVersion := "2.13.5",
+    otherScalaVersions := List(),
   )
 
   private def commandAliases = addCommandAlias("ci-release", ";releaseEarly") ++
@@ -64,31 +66,33 @@ object TmmSbtPlugin extends AutoPlugin {
     Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
   ) ++ sbt.inThisBuild(
     List(
-      organization := sonatypeProfile + "." + baseProjectName,
+      organization := (ThisBuild / sonatypeProfile).value + "." + (ThisBuild / baseProjectName).value,
       publishMavenStyle := true,
       sonatypeProjectHosting := Some(
         GitHubHosting(
-          githubUser.value,
-          githubProjectName.value,
-          githubUserFullName.value,
-          githubUserEmail.value,
+          (ThisBuild / githubUser).value,
+          (ThisBuild / githubProjectName).value,
+          (ThisBuild / githubUserFullName).value,
+          (ThisBuild / githubUserEmail).value,
         ),
       ),
-      homepage := Some(url(s"https://github.com/$githubUser/$githubProjectName")),
+      homepage := Some(
+        url(s"https://github.com/${(ThisBuild / githubUser).value}/${(ThisBuild / githubProjectName).value}"),
+      ),
       startYear := Some(2019),
       licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
       developers := List(
         Developer(
-          githubUser.value,
-          githubUserFullName.value,
-          githubUserEmail.value,
-          url(githubUserWebsite.value),
+          (ThisBuild / githubUser).value,
+          (ThisBuild / githubUserFullName).value,
+          (ThisBuild / githubUserEmail).value,
+          url((ThisBuild / githubUserWebsite).value),
         ),
       ),
       scmInfo := Some(
         ScmInfo(
-          url(s"https://github.com/$githubUser/$githubProjectName"),
-          s"scm:git:https://github.com/$githubUser/$githubProjectName.git",
+          url(s"https://github.com/${(ThisBuild / githubUser).value}/${(ThisBuild / githubProjectName).value}"),
+          s"scm:git:https://github.com/${(ThisBuild / githubUser).value}/${(ThisBuild / githubProjectName).value}.git",
         ),
       ),
       pgpPublicRing := file("/tmp/secrets/pubring.kbx"),
@@ -100,13 +104,13 @@ object TmmSbtPlugin extends AutoPlugin {
 
   private def compilerPlugins =
     List(
-      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.0" cross CrossVersion.full), // TODO upgrade
+      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.3" cross CrossVersion.full), // TODO upgrade
       addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
     )
 
   private def scalaVersionSettings = List(
-    scalaVersion := primaryScalaVersion.value,
-    crossScalaVersions := Seq(primaryScalaVersion.value) ++ otherScalaVersions.value,
+    scalaVersion := (ThisBuild / primaryScalaVersion).value,
+    crossScalaVersions := Seq((ThisBuild / primaryScalaVersion).value) ++ (ThisBuild / otherScalaVersions).value,
   )
 
   private def githubWorkflowSettings = List(
@@ -136,12 +140,14 @@ object TmmSbtPlugin extends AutoPlugin {
     ),
   )
 
-  override def globalSettings: Seq[Def.Setting[_]] = defaultsForSettings ++ commandAliases
+  override def globalSettings: Seq[Def.Setting[_]] =
+    defaultsForSettings ++
+      commandAliases ++
+      scalaVersionSettings
 
   override def buildSettings: Seq[Def.Setting[_]] =
-      sonatypeSettings ++
+    sonatypeSettings ++
       compilerPlugins ++
-      scalaVersionSettings ++
       githubWorkflowSettings
 
 }
