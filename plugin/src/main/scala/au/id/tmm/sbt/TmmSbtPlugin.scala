@@ -46,7 +46,7 @@ object TmmSbtPlugin extends AutoPlugin {
       org.scalafmt.sbt.ScalafmtPlugin &&
       sbtghactions.GitHubActionsPlugin
 
-  override def globalSettings: Seq[Def.Setting[_]] = List(
+  private def defaultsForSettings = List(
     (ThisBuild / githubUser) := "tmccarthy",
     (ThisBuild / githubProjectName) := baseProjectName.value,
     (ThisBuild / githubUserFullName) := "Timothy McCarthy",
@@ -56,72 +56,92 @@ object TmmSbtPlugin extends AutoPlugin {
     (ThisBuild / otherScalaVersions) := List(),
   )
 
-  override def buildSettings: Seq[Def.Setting[_]] =
+  private def commandAliases = addCommandAlias("ci-release", ";releaseEarly") ++
+    addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
+
+  private def sonatypeSettings = List(
+    releaseEarly / Keys.aggregate := false, // Workaround for https://github.com/scalacenter/sbt-release-early/issues/30
+    Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
+  ) ++ sbt.inThisBuild(
     List(
-      releaseEarly / Keys.aggregate := false, // Workaround for https://github.com/scalacenter/sbt-release-early/issues/30
-      Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
-    ) ++ sbt.inThisBuild(
-      List(
-        addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full), // TODO upgrade
-        organization := sonatypeProfile + "." + baseProjectName,
-        publishMavenStyle := true,
-        sonatypeProjectHosting := Some(
-          GitHubHosting(
-            githubUser.value,
-            githubProjectName.value,
-            githubUserFullName.value,
-            githubUserEmail.value,
-          ),
-        ),
-        homepage := Some(url(s"https://github.com/$githubUser/$githubProjectName")),
-        startYear := Some(2019),
-        licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-        developers := List(
-          Developer(
-            githubUser.value,
-            githubUserFullName.value,
-            githubUserEmail.value,
-            url(githubUserWebsite.value),
-          ),
-        ),
-        scmInfo := Some(
-          ScmInfo(
-            url(s"https://github.com/$githubUser/$githubProjectName"),
-            s"scm:git:https://github.com/$githubUser/$githubProjectName.git",
-          ),
-        ),
-        pgpPublicRing := file("/tmp/secrets/pubring.kbx"),
-        pgpSecretRing := file("/tmp/secrets/secring.gpg"),
-        releaseEarlyWith := ReleaseEarlyPlugin.autoImport.SonatypePublisher,
-        releaseEarlyEnableInstantReleases := false,
-        scalaVersion := primaryScalaVersion.value,
-        crossScalaVersions := Seq(primaryScalaVersion.value) ++ otherScalaVersions.value,
-      ),
-    ) ++ addCommandAlias("ci-release", ";releaseEarly") ++ List(
-      ThisBuild / githubWorkflowTargetTags ++= Seq("v*"),
-      ThisBuild / githubWorkflowPublishTargetBranches :=
-        Seq(RefPredicate.StartsWith(Ref.Tag("v"))),
-      ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11"),
-      ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck"))),
-      ThisBuild / githubWorkflowPublish := List(
-        WorkflowStep.Sbt(
-          List("ci-release"),
-          env = Map(
-            "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
-            "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
-            "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
-          ),
+      organization := sonatypeProfile + "." + baseProjectName,
+      publishMavenStyle := true,
+      sonatypeProjectHosting := Some(
+        GitHubHosting(
+          githubUser.value,
+          githubProjectName.value,
+          githubUserFullName.value,
+          githubUserEmail.value,
         ),
       ),
-      ThisBuild / githubWorkflowPublishPreamble := List(
-        WorkflowStep.Run(
-          commands = List("""./.secrets/decrypt.sh"""), // TODO don't do this with an external script
-          name = Some("Decrypt secrets"),
-          env = Map(
-            "AES_KEY" -> "${{ secrets.AES_KEY }}",
-          ),
+      homepage := Some(url(s"https://github.com/$githubUser/$githubProjectName")),
+      startYear := Some(2019),
+      licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+      developers := List(
+        Developer(
+          githubUser.value,
+          githubUserFullName.value,
+          githubUserEmail.value,
+          url(githubUserWebsite.value),
         ),
       ),
-    ) ++ addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
+      scmInfo := Some(
+        ScmInfo(
+          url(s"https://github.com/$githubUser/$githubProjectName"),
+          s"scm:git:https://github.com/$githubUser/$githubProjectName.git",
+        ),
+      ),
+      pgpPublicRing := file("/tmp/secrets/pubring.kbx"),
+      pgpSecretRing := file("/tmp/secrets/secring.gpg"),
+      releaseEarlyWith := ReleaseEarlyPlugin.autoImport.SonatypePublisher,
+      releaseEarlyEnableInstantReleases := false,
+    ),
+  )
+
+  private def compilerPlugins =
+    List(
+      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.0" cross CrossVersion.full), // TODO upgrade
+      addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
+    )
+
+  private def scalaVersionSettings = List(
+    scalaVersion := primaryScalaVersion.value,
+    crossScalaVersions := Seq(primaryScalaVersion.value) ++ otherScalaVersions.value,
+  )
+
+  private def githubWorkflowSettings = List(
+    ThisBuild / githubWorkflowTargetTags ++= Seq("v*"),
+    ThisBuild / githubWorkflowPublishTargetBranches :=
+      Seq(RefPredicate.StartsWith(Ref.Tag("v"))),
+    ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11"),
+    ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck"))),
+    ThisBuild / githubWorkflowPublish := List(
+      WorkflowStep.Sbt(
+        List("ci-release"),
+        env = Map(
+          "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
+          "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
+          "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
+        ),
+      ),
+    ),
+    ThisBuild / githubWorkflowPublishPreamble := List(
+      WorkflowStep.Run(
+        commands = List("""./.secrets/decrypt.sh"""), // TODO don't do this with an external script
+        name = Some("Decrypt secrets"),
+        env = Map(
+          "AES_KEY" -> "${{ secrets.AES_KEY }}",
+        ),
+      ),
+    ),
+  )
+
+  override def globalSettings: Seq[Def.Setting[_]] = defaultsForSettings ++ commandAliases
+
+  override def buildSettings: Seq[Def.Setting[_]] =
+      sonatypeSettings ++
+      compilerPlugins ++
+      scalaVersionSettings ++
+      githubWorkflowSettings
 
 }
