@@ -27,6 +27,7 @@ object TmmSbtPlugin extends AutoPlugin {
       publish / skip := true,
       name := (ThisBuild / baseProjectName).value,
       crossScalaVersions := Nil,
+      sonatypeProfileNameSetting,
     )
 
     def settingsForSubprojectCalled(name: String) = Seq(
@@ -34,6 +35,7 @@ object TmmSbtPlugin extends AutoPlugin {
       ScalacSettings.scalacSetting,
       publishConfiguration := publishConfiguration.value.withOverwrite(true),
       publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
+      sonatypeProfileNameSetting,
     ) ++ DependencySettings.commonDependencies
 
   }
@@ -61,11 +63,15 @@ object TmmSbtPlugin extends AutoPlugin {
   private def commandAliases = addCommandAlias("ci-release", ";releaseEarly") ++
     addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
 
+  // TODO this is probably being used in too many places but it has fixed it so 🤷
+  private def sonatypeProfileNameSetting = Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value
+
   private def sonatypeSettings = List(
     releaseEarly / Keys.aggregate := false, // Workaround for https://github.com/scalacenter/sbt-release-early/issues/30
+    sonatypeProfileNameSetting,
   ) ++ sbt.inThisBuild(
     List(
-      Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
+      sonatypeProfileNameSetting,
       organization := (ThisBuild / sonatypeProfile).value + "." + (ThisBuild / baseProjectName).value,
       publishMavenStyle := true,
       sonatypeProjectHosting := Some(
