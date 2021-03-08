@@ -63,9 +63,9 @@ object TmmSbtPlugin extends AutoPlugin {
 
   private def sonatypeSettings = List(
     releaseEarly / Keys.aggregate := false, // Workaround for https://github.com/scalacenter/sbt-release-early/issues/30
-    Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
   ) ++ sbt.inThisBuild(
     List(
+      Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value,
       organization := (ThisBuild / sonatypeProfile).value + "." + (ThisBuild / baseProjectName).value,
       publishMavenStyle := true,
       sonatypeProjectHosting := Some(
