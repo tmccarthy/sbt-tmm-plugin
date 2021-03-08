@@ -15,7 +15,7 @@ lazy val root = project
 lazy val plugin = project
   .in(file("plugin"))
   .enablePlugins(SbtPlugin)
-  .settings(settingsForSubprojectCalled("sbt-tmm-plugin"))
+  .settings(settingsForSubprojectCalled("tmm-plugin"))
   .settings(
     addSbtPlugin("org.xerial.sbt" % "sbt-sonatype"       % "2.4"),
     addSbtPlugin("com.jsuereth"   % "sbt-pgp"            % "1.1.2"),
