@@ -1,41 +1,12 @@
-val settingsHelper = ProjectSettingsHelper("au.id.tmm", "sbt")(
-  githubProjectName = "sbt-tmm-plugin",
-)
+ThisBuild / sonatypeProfile := "au.id.tmm"
+ThisBuild / baseProjectName := "sbt"
+ThisBuild / githubProjectName := "sbt-tmm-plugin"
 
-addCommandAlias("ci-release", ";releaseEarly")
-
-ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
-ThisBuild / githubWorkflowPublishTargetBranches :=
-  Seq(RefPredicate.StartsWith(Ref.Tag("v")))
-
-ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11")
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck")))
-ThisBuild / githubWorkflowPublish := List(
-  WorkflowStep.Sbt(
-    List("ci-release"),
-    env = Map(
-      "PGP_PASSWORD" -> "${{ secrets.PGP_PASSWORD }}",
-      "SONA_PASS"    -> "${{ secrets.SONATYPE_PASSWORD }}",
-      "SONA_USER"    -> "${{ secrets.SONATYPE_USER }}",
-    ),
-  ),
-)
-
-ThisBuild / githubWorkflowPublishPreamble := List(
-  WorkflowStep.Run(
-    commands = List("""./.secrets/decrypt.sh"""),
-    name = Some("Decrypt secrets"),
-    env = Map(
-      "AES_KEY" -> "${{ secrets.AES_KEY }}",
-    ),
-  ),
-)
-
-settingsHelper.settingsForBuild
+ThisBuild / primaryScalaVersion := "2.12.13"
 
 lazy val root = project
   .in(file("."))
-  .settings(settingsHelper.settingsForRootProject)
+  .settings(settingsForRootProject)
   .settings(console := (console in Compile in plugin).value)
   .aggregate(
     plugin,
@@ -44,12 +15,7 @@ lazy val root = project
 lazy val plugin = project
   .in(file("plugin"))
   .enablePlugins(SbtPlugin)
-  .settings(
-    name := "sbt-tmm-plugin",
-    ScalacSettings.scalacSetting,
-    publishConfiguration := publishConfiguration.value.withOverwrite(true),
-    publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
-  )
+  .settings(settingsForSubprojectCalled("sbt-tmm-plugin"))
   .settings(
     addSbtPlugin("org.xerial.sbt" % "sbt-sonatype"       % "2.4"),
     addSbtPlugin("com.jsuereth"   % "sbt-pgp"            % "1.1.2"),
@@ -57,8 +23,3 @@ lazy val plugin = project
     addSbtPlugin("ch.epfl.scala"  % "sbt-release-early"  % "2.1.1"),
     addSbtPlugin("com.codecommit" % "sbt-github-actions" % "0.10.1"),
   )
-  .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0-M4" % "test",
-  )
-
-addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
