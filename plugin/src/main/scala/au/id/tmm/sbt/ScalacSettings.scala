@@ -41,7 +41,6 @@ object ScalacSettings {
   )
 
   private val scalacOptions3_0 = Seq(
-    "-deprecation",   // Emit warning and location for usages of deprecated APIs.
     "-explain-types", // Explain type errors in more detail.
     "-explain",       // Explain errors in more detail.
   )
