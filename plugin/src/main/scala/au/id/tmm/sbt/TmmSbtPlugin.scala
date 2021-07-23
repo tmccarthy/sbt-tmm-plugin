@@ -56,7 +56,7 @@ object TmmSbtPlugin extends AutoPlugin {
     githubUserFullName := "Timothy McCarthy",
     githubUserEmail := "ebh042@gmail.com",
     githubUserWebsite := "http://tmm.id.au",
-    primaryScalaVersion := "2.13.5",
+    primaryScalaVersion := "2.13.6",
     otherScalaVersions := List(),
   )
 
@@ -109,13 +109,7 @@ object TmmSbtPlugin extends AutoPlugin {
     ),
   )
 
-  private def compilerPlugins =
-    kindProjectorSettings ++
-      List(
-        addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-      )
-
-  private def kindProjectorSettings = List(
+  private def compilerPlugins = List(
     ThisBuild / scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _))                  => List("-Ykind-projector:underscores")
@@ -127,7 +121,10 @@ object TmmSbtPlugin extends AutoPlugin {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _)) => List.empty
         case Some((2, 13)) | Some((2, 12)) =>
-          List(compilerPlugin("org.typelevel" % "kind-projector" % "0.13.0" cross CrossVersion.full))
+          List(
+            compilerPlugin("org.typelevel" % "kind-projector"     % "0.13.0" cross CrossVersion.full),
+            compilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
+          )
         case _ => List.empty
       }
     },

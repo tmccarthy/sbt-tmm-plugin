@@ -9,14 +9,17 @@ object ScalacSettings {
     "-deprecation", // Emit warning and location for usages of deprecated APIs.
     "-encoding",
     "utf-8",                         // Specify character encoding used by source files.
-    "-explaintypes",                 // Explain type errors in more detail.
     "-feature",                      // Emit warning and location for usages of features that should be imported explicitly.
     "-language:existentials",        // Existential types (besides wildcard types) can be written and inferred
     "-language:higherKinds",         // Allow higher-kinded types
     "-language:implicitConversions", // Allow implicit conversions
     "-unchecked",                    // Enable additional warnings where generated code depends on assumptions.
-    "-Xcheckinit",                   // Wrap field accessors to throw an exception on uninitialized access.
     "-Xfatal-warnings",              // Fail the compilation if there are any warnings.
+  )
+
+  private val scalacOptions2_13 = Seq(
+    "-explaintypes",                 // Explain type errors in more detail.
+    "-Xcheckinit",                   // Wrap field accessors to throw an exception on uninitialized access.
     "-Xlint:constant",               // Evaluation of a constant arithmetic expression results in an error.
     "-Xlint:delayedinit-select",     // Selecting member of DelayedInit.
     "-Xlint:doc-detached",           // A Scaladoc comment appears to be detached from its element.
@@ -37,13 +40,17 @@ object ScalacSettings {
     "80", // Increase max exhaustion depth
   )
 
-  private val scalacOptions2_13 = Seq(
+  private val scalacOptions3_0 = Seq(
+    "-deprecation",   // Emit warning and location for usages of deprecated APIs.
+    "-explain-types", // Explain type errors in more detail.
+    "-explain",       // Explain errors in more detail.
   )
 
   def scalacSetting =
     Keys.scalacOptions :=
       scalacOptionsCommon ++ {
         CrossVersion.partialVersion(Keys.scalaVersion.value) match {
+          case Some((3, _))  => scalacOptions3_0
           case Some((2, 13)) => scalacOptions2_13
           case _             => Seq.empty
         }
