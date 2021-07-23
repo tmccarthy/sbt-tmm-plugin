@@ -109,10 +109,21 @@ object TmmSbtPlugin extends AutoPlugin {
   )
 
   private def compilerPlugins =
-    List(
-      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.3" cross CrossVersion.full), // TODO upgrade
-      addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
-    )
+    kindProjectorSettings ++
+      List(
+        addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
+      )
+
+  private def kindProjectorSettings = List(
+    ThisBuild / scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _))                  => Seq("-Ykind-projector:underscores")
+        case Some((2, 13)) | Some((2, 12)) => Seq("-Xsource:3", "-P:kind-projector:underscore-placeholders")
+        case _                             => Seq.empty
+      }
+    },
+    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.0" cross CrossVersion.full),
+  )
 
   private def scalaVersionSettings = List(
     scalaVersion := (ThisBuild / primaryScalaVersion).value,
