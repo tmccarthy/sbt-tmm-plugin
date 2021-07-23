@@ -117,12 +117,19 @@ object TmmSbtPlugin extends AutoPlugin {
   private def kindProjectorSettings = List(
     ThisBuild / scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _))                  => Seq("-Ykind-projector:underscores")
-        case Some((2, 13)) | Some((2, 12)) => Seq("-Xsource:3", "-P:kind-projector:underscore-placeholders")
-        case _                             => Seq.empty
+        case Some((3, _))                  => List("-Ykind-projector:underscores")
+        case Some((2, 13)) | Some((2, 12)) => List("-Xsource:3", "-P:kind-projector:underscore-placeholders")
+        case _                             => List.empty
       }
     },
-    addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.0" cross CrossVersion.full),
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((3, _)) => List.empty
+        case Some((2, 13)) | Some((2, 12)) =>
+          List(compilerPlugin("org.typelevel" % "kind-projector" % "0.13.0" cross CrossVersion.full))
+        case _ => List.empty
+      }
+    },
   )
 
   private def scalaVersionSettings = List(
