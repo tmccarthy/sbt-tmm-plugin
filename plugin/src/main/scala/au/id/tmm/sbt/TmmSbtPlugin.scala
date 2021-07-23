@@ -61,7 +61,8 @@ object TmmSbtPlugin extends AutoPlugin {
   )
 
   private def commandAliases = addCommandAlias("ci-release", ";releaseEarly") ++
-    addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck")
+    addCommandAlias("check", ";+test;scalafmtCheckAll;scalafmtSbtCheck;githubWorkflowCheck") ++
+    addCommandAlias("fix", ";+scalafmtAll;scalafmtSbt;githubWorkflowGenerate")
 
   // TODO this is probably being used in too many places but it has fixed it so 🤷
   private def sonatypeProfileNameSetting = Sonatype.SonatypeKeys.sonatypeProfileName := sonatypeProfile.value
