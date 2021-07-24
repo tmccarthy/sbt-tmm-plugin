@@ -6,9 +6,7 @@ import sbt.librarymanagement.CrossVersion
 object ScalacSettings {
 
   private val scalacOptionsCommon = Seq(
-    "-deprecation", // Emit warning and location for usages of deprecated APIs.
-    "-encoding",
-    "utf-8",                         // Specify character encoding used by source files.
+    "-deprecation",                  // Emit warning and location for usages of deprecated APIs.
     "-feature",                      // Emit warning and location for usages of features that should be imported explicitly.
     "-language:existentials",        // Existential types (besides wildcard types) can be written and inferred
     "-language:higherKinds",         // Allow higher-kinded types
@@ -18,6 +16,8 @@ object ScalacSettings {
   )
 
   private val scalacOptions2_13 = Seq(
+    "-encoding",
+    "utf-8",                         // Specify character encoding used by source files.
     "-explaintypes",                 // Explain type errors in more detail.
     "-Xcheckinit",                   // Wrap field accessors to throw an exception on uninitialized access.
     "-Xlint:constant",               // Evaluation of a constant arithmetic expression results in an error.
@@ -41,6 +41,9 @@ object ScalacSettings {
   )
 
   private val scalacOptions3_0 = Seq(
+    // TODO add this flag back when it doesn't break IntelliJ
+//    "-encoding",
+//    "utf-8",                         // Specify character encoding used by source files.
     "-explain-types", // Explain type errors in more detail.
     "-explain",       // Explain errors in more detail.
   )
