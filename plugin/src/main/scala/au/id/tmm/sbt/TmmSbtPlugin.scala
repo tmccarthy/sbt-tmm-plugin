@@ -6,6 +6,7 @@ import com.typesafe.sbt.SbtPgp.autoImportImpl.{pgpPublicRing, pgpSecretRing}
 import sbt.Keys._
 import sbt.{Def, addCommandAlias, _}
 import sbtghactions.GenerativePlugin.autoImport._
+import sbtghactions.JavaSpec.Distribution.Adopt
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.GitHubHosting
 import xerial.sbt.Sonatype.autoImport.sonatypeProjectHosting
@@ -139,7 +140,10 @@ object TmmSbtPlugin extends AutoPlugin {
     ThisBuild / githubWorkflowTargetTags ++= Seq("v*"),
     ThisBuild / githubWorkflowPublishTargetBranches :=
       Seq(RefPredicate.StartsWith(Ref.Tag("v"))),
-    ThisBuild / githubWorkflowJavaVersions := List("adopt@1.8", "adopt@1.11"),
+    ThisBuild / githubWorkflowJavaVersions := List(
+      JavaSpec(Adopt, "1.8"),
+      JavaSpec(Adopt, "1.11"),
+    ),
     ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scalafmtCheckAll", "scalafmtSbtCheck"))),
     ThisBuild / githubWorkflowPublish := List(
       WorkflowStep.Sbt(
