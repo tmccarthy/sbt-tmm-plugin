@@ -56,7 +56,7 @@ object TmmSbtPlugin extends AutoPlugin {
     githubUserFullName := "Timothy McCarthy",
     githubUserEmail := "ebh042@gmail.com",
     githubUserWebsite := "http://tmm.id.au",
-    primaryScalaVersion := "2.13.6",
+    primaryScalaVersion := "2.13.8",
     otherScalaVersions := List(),
   )
 
@@ -122,7 +122,7 @@ object TmmSbtPlugin extends AutoPlugin {
         case Some((3, _)) => List.empty
         case Some((2, 13)) | Some((2, 12)) =>
           List(
-            compilerPlugin("org.typelevel" % "kind-projector"     % "0.13.0" cross CrossVersion.full),
+            compilerPlugin("org.typelevel" % "kind-projector"     % "0.13.2" cross CrossVersion.full),
             compilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
           )
         case _ => List.empty
