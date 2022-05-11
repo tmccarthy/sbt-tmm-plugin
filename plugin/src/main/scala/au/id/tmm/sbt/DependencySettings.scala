@@ -5,7 +5,7 @@ import sbt._
 
 object DependencySettings {
 
-  val mUnitVersion = "1.0.0-M3"
+  val mUnitVersion = "0.7.27"
 
   val commonDependencies = Seq(
     libraryDependencies += "org.scalameta" %% "munit" % mUnitVersion % Test,
