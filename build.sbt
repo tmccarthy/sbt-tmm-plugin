@@ -18,8 +18,8 @@ lazy val plugin = project
   .settings(settingsForSubprojectCalled("tmm-plugin"))
   .settings(
     // TODO these are a nightmare to upgrade
-    addSbtPlugin("org.xerial.sbt" % "sbt-sonatype"       % "2.4"),
-    addSbtPlugin("com.jsuereth"   % "sbt-pgp"            % "1.1.2"),
+    addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.4"),
+    addSbtPlugin("com.jsuereth"   % "sbt-pgp"      % "1.1.2"),
   )
   .settings(
     addSbtPlugin("org.scalameta"  % "sbt-scalafmt"       % "2.4.6"),
